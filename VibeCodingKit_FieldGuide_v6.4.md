@@ -197,7 +197,7 @@ v6.1 keeps every safeguard's intent and removes the make-work:
    taxonomy changes, so capturing a learning never triggers a sync-then-re-verify dance.
 5. **Learnings steer from the start.** `AGENTS.md` §0b holds an always-on digest of the
    highest-leverage failure modes, so the agent avoids the common patterns from the first line;
-   the full 77-entry taxonomy stays on demand via the index, with the structural ones enforced.
+   the full taxonomy stays on demand via the index, with the structural ones enforced.
 6. **Run & observe the app.** A portable Playwright `smoke` gate + template replaces v6's habit
    of deferring every GUI check as "[~] can't verify". "Done" means run-and-observed.
 
@@ -281,7 +281,7 @@ the bookkeeping the gate also polices. v6's worst overhead was exactly this; v6.
   (`.claude/settings.json`, `.opencode/plugins/prompt-logger.js`) capture it outside the
   model's control; in v6.1 they filter out tool-echoes/file-dumps and stamp offset-aware
   timestamps. **Passive evidence — the agent never edits it.**
-- **SinsGotchasLearnings.md** — the incident-indexed defect taxonomy (77 shipped entries). Each
+- **SinsGotchasLearnings.md** — the incident-indexed defect taxonomy (dozens of shipped entries). Each
   entry is prose; a few carry an optional `### Audit Rule` (ast-grep) that `just audit-sins`
   compiles to `rules/*.sins.yml` and runs. The highest-leverage entries are mirrored into
   `AGENTS.md §0b`.
