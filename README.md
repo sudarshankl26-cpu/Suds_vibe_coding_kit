@@ -1,4 +1,4 @@
-# Suds_vibe_coding_kit
+# Suds vibe coding kit
 A small set of files you drop into a project before you write code, so AI coding agents stop drifting — without spending their budget proving they followed a process.
 
 <p align="center">
