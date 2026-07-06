@@ -1,19 +1,19 @@
-# Suds vibe coding kit
-A small set of files you drop into a project before you write code, so AI coding agents stop drifting — without spending their budget proving they followed a process.
-
 <p align="center">
   <img src="assets/hero.svg" alt="Sud's Vibe Coding Kit" width="100%">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v6.4-1b2430?style=flat-square" alt="version">
+  <img src="https://img.shields.io/badge/version-v6.5-1b2430?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/philosophy-suggestions%20%3E%20gates-3b5bdb?style=flat-square" alt="philosophy">
   <img src="https://img.shields.io/badge/runtime%20deps-none-2b8a6e?style=flat-square" alt="no runtime deps">
   <img src="https://img.shields.io/badge/platform-Windows%2011%20%2B%20WSL-444?style=flat-square" alt="platform">
   <img src="https://img.shields.io/badge/macOS%20%2F%20Linux-via%20one%20prompt-7b8494?style=flat-square" alt="mac/linux">
+  <img src="https://img.shields.io/badge/tested%20with-GLM%20%C2%B7%20DeepSeek%20%C2%B7%20MiMo%20%C2%B7%20MiniMax-7950f2?style=flat-square" alt="tested models">
 </p>
 
 <p align="center"><b>A small set of files you drop into a project <i>before</i> you write code, so AI coding agents stop drifting — without spending their budget proving they followed a process.</b></p>
+
+<p align="center"><sub>📰 <b>What's new in v6.5:</b> trustworthy gates that can't silently false-green · docs that can't rot silently · a learning loop with a motor · subagent economics · CRLF-immune gates on Windows.</sub></p>
 
 ---
 
@@ -121,13 +121,13 @@ Everything else (`just`, `uv`, `pnpm`, `ast-grep`, the gates) is already cross-p
 |---|---|---|
 | **Contracts** (ground truth) | `PRD.md` · `GLOSSARY.md` · `DATA_MODEL.md` · `ARCHITECTURE.md` · `DESIGN_GUIDELINES.md` · `types/` | What the app does, every term, the data grain & units, the architecture, the visual standard. |
 | **Governance** (how the agent works) | `AGENTS.md` (single source of truth) · `CONTEXT.md` · `EXECUTION_PLAN.md` · `STATE.md` · `MODEL_NOTES.md` · `PROMPTS.md` | Rules, routing, the phased plan, the live cursor, per-model tips, the reusable prompt library. |
-| **Memory & gates** (enforced only where objective) | `RepoMapReadFirst.md` · `SinsGotchasLearnings.md` + `rules/*.sins.yml` · `OpenTasksMustCompleteAll.md` · `UserPromptLog.md` · `WorkLogAfterEachRun.md` · `justfile` | The repo map, the defect taxonomy (some compiled to ast-grep rules), the anti-drop checklist, passive prompt log, work log, and the `just verify` / `just verify-all` gates. |
+| **Memory & gates** (enforced only where objective) | `RepoMapReadFirst.md` · `SinsGotchasLearnings.md` + `rules/*.sins.yml` · `SinsArchive.md` · `OpenTasksMustCompleteAll.md` · `UserPromptLog.md` · `WorkLogAfterEachRun.md` · `justfile` | The repo map, the defect taxonomy (some compiled to ast-grep rules), the sins archive (retired entries), the anti-drop checklist, passive prompt log, work log, and the gates: `just verify` / `just verify-all` / `just doctor` / `just sins-triage`. |
 
 Every other tool-config file (`CLAUDE.md`, `GEMINI.md`, `.cursor/`, `.kilocode/`, `.windsurfrules`, `.zed/`, `.rules`, `.codex/`) is a **three-line pointer** back to `AGENTS.md`, so rules can't drift.
 
 ### Supported tools
 
-Claude Code · OpenAI Codex CLI · Gemini / Antigravity · Cursor · Windsurf · Kilocode · Zed · OpenCode · Hermes — **any tool that reads `AGENTS.md` works.** Tested with GLM, DeepSeek, MiniMax, MiMo, Claude, and Gemini.
+Claude Code · OpenAI Codex CLI · Gemini / Antigravity · Cursor · Windsurf · Kilocode · Zed · OpenCode · Stagewise · Qoder · Hermes — **any tool that reads `AGENTS.md` works.** Tested with GLM 5.2, DeepSeek V4 Pro, Xiaomi MiMo 2.5 Pro, MiniMax M3, Claude, and Gemini.
 
 ---
 
@@ -138,7 +138,21 @@ Claude Code · OpenAI Codex CLI · Gemini / Antigravity · Cursor · Windsurf ·
 - **It makes the right thing the cheap thing** — re-orienting from `RepoMapReadFirst.md` costs ~2k tokens instead of a 50k re-walk; trusting a green gate beats re-checking by hand.
 - **It refuses to gate process** — anything that would police the agent's own prose is left as a suggestion, so the agent spends its budget building, not proving.
 
-Read `VibeCodingKit_FieldGuide_v6.4.md` for the full rationale, or open `VibeCodingKit_Infographic_v6.4.html` for the visual one-pager.
+Read `VibeCodingKit_FieldGuide_v6.5.md` for the full rationale, or open `VibeCodingKit_Infographic_v6.5.html` for the visual one-pager.
+
+---
+
+## What's new in v6.5
+
+v6.5 attacks the three failure modes observed across real builds — **gates that silently no-op'd, descriptive files that decayed into fiction, and a sins file that documented mistakes without preventing repeats** — and stays true to v6.1's "gate the product, not the process." No new per-turn ceremony.
+
+1. **No silent false-greens (`run_gate.py`, `just doctor`).** A gate whose stack is configured but whose tool is missing now **fails loudly** (exit 3, with the exact setup command) instead of printing "skipping" and passing. The JS package manager is **detected from the lockfile** (pnpm/npm/yarn/bun — never assumed). New **`just doctor`** self-tests the harness so a green `verify` is *earned*. The root cause this closes: a real harness once silently no-op'd for an entire phase because "skipping" warnings were scrolled past.
+2. **Docs that can't rot silently (`dox-check`).** Contract docs are scanned for backticked repo paths: wholesale rot (≥3 missing and >30%) is a hard failure; `RepoMapReadFirst.md` additionally fails on leftover `[fill in]` placeholders once the repo has real source. An agent that catches one stale doc rationally stops trusting all of them.
+3. **The learning loop gets a motor.** Entries now carry retrieval metadata (`Scope:` / `Trigger:` / `Enforced:` / `Digest:` / `Recurrences:`), and the generated index is organized for retrieval at the point of action: a **★ALWAYS block**, a **trigger map** ("about to touch `fetch` / `useEffect` / `src/db/**`? → read exactly these §s"), and enforced entries collapsed out of the read path. The **recurrence ratchet**: a repeat is never re-documented — increment `Recurrences:`, and at 2+ promotion up the enforcement ladder (type → ast-grep rule → test → digest) is mandatory. `just sins-triage` reports loop health.
+4. **Subagent economics (§4b).** A **context firewall** (subagents write to gitignored `.scratch/<task>/`, return path + 3-line summary + confidence — never raw dumps), **handoff packets** (delegated prompts written for zero chat context), and a **stakes / reversibility / ambiguity floor** for routing slices across model tiers.
+5. **CRLF-immune gates on Windows.** Every gate normalizes `\r\n` → `\n` on read, so a Windows editor that saves CRLF can no longer silently break the regexes that anchor on `\n`.
+
+> **Upgrading from v6.4?** It's a surgical swap of ~10 infra files (your contracts, learnings, logs, STATE.md, and src/ are untouched). See `migrate/MIGRATION.md` §"v6.4 → v6.5 manual swap" inside the kit.
 
 ---
 
@@ -153,6 +167,7 @@ This kit stands on existing ideas and tools:
 - **[Playwright](https://playwright.dev/)** backs the `smoke` gate so "done" means run-and-observed.
 - The optional hierarchical `AGENTS.md` layer (§10) is inspired by the **DOX** documentation-as-context framework.
 - v6.4's *inline flags* and *reuse-first* ideas were distilled from studying a production SAFe multi-agent harness — taking the ideas, not the team-process overhead.
+- v6.5's *subagent economics* (context firewall, handoff packets, routing floor) were borrowed from a premium-model orchestration harness and made tool-agnostic.
 
 ---
 

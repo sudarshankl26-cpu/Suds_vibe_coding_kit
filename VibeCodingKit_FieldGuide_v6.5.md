@@ -1,4 +1,4 @@
-# Sud's Vibe Coding Kit — Field Guide (v6.4)
+# Sud's Vibe Coding Kit — Field Guide (v6.5)
 
 *Concepts, the problems they solve, why they work, and how to run it.*
 For solo, multi-tool development (Claude Code, Kilo/VSCodium, Zed, OpenCode, Windsurf,
@@ -62,6 +62,58 @@ wrong thing. Five minutes of questions here saves hours of rework.
 
 The rest of this guide explains *why* each piece exists. You don't need it to start — it's what
 makes the kit make sense once you do.
+
+---
+
+## What's new in v6.5 — trustworthy gates, docs that can't rot silently, and a learning loop with a motor
+
+v6.5 attacks the three failure modes observed across real builds: gates that silently
+no-op'd, descriptive files that decayed into fiction, and a sins file that documented
+mistakes without preventing repeats.
+
+1. **No silent false-greens (`run_gate.py`, `just doctor`).** The root cause of a real
+   all-gates-skip incident: the runner hardcoded `pnpm`, the project used npm, and every
+   gate printed "skipping" and passed. Now the JS package manager is **detected from the
+   lockfile** (pnpm/npm/yarn/bun), launchers resolve through `shutil.which` (fixing the
+   Windows `.cmd` blindness), and a **configured stack whose tool is missing FAILS** (exit 3,
+   with the exact fix command) instead of skipping — `KIT_GATES_LENIENT=1` demotes that to a
+   warning for deliberately bare machines. Every gate ends with an accounting line
+   (`ran / unconfigured / MISSING`). New **`just doctor`** self-tests the harness — proof
+   that every configured gate can actually execute — so a green `verify` is *earned*. Run it
+   after scaffold and on any new machine.
+2. **Docs that can't rot silently (`dox-check` 5–6).** The descriptive files "didn't work"
+   because nothing failed when they stopped matching the code — and an agent that catches one
+   stale doc rationally discounts all of them. `dox-check` (already in `just verify`) now
+   scans contract docs for backticked repo paths: wholesale rot (≥3 missing and >30%) is a
+   hard failure; a few missing paths are informational (mark planned ones
+   `<!-- planned -->`). `RepoMapReadFirst.md` additionally fails on leftover `[fill in]`
+   placeholders once the repo has real source. §3 gains completion criterion #4: the
+   descriptive files still describe reality (`just map-sync` + contract reconciliation).
+3. **The learning loop gets a motor (metadata, trigger map, recurrence ratchet,
+   `sins-triage`).** A model doesn't learn by writing an entry — an entry only prevents a
+   repeat if it's in context at the moment the risky code is written, or enforced by a gate.
+   So entries now carry retrieval metadata (`Scope:` / `Trigger:` / `Enforced:` /
+   `Digest:` / `Recurrences:`), and the generated index is organized for retrieval at the
+   point of action: a **★ALWAYS block** (project digest extending AGENTS §0b, ~20-item
+   attention budget), a **trigger map** (about to touch `fetch` / `useEffect` / `src/db/**`?
+   → read exactly these §s), and **⚙ enforced entries collapsed out of the read path**
+   (trust the gate). The **recurrence ratchet** is the key rule: a repeat is never
+   re-documented — increment `Recurrences:`, and at 2+ promotion up the enforcement ladder
+   (type → ast-grep rule → regression test → digest) is mandatory. `just sins-triage`
+   reports loop health; `skills/sins-triage.md` is the periodic consolidation ritual
+   (merge → generalize → promote → collapse). The shipped taxonomy now carries metadata and
+   a ★ALWAYS default set out of the box.
+4. **Subagent economics (§4b).** Borrowed from a premium-model orchestration harness and
+   made tool-agnostic: the **context firewall** (subagents write to gitignored
+   `.scratch/<task>/`, return path + 3-line summary + confidence — never raw dumps into the
+   orchestrator's context), **handoff packets** (delegated prompts written for zero chat
+   context, with scope, output location, verification command, stop conditions), and a
+   **stakes / reversibility / ambiguity floor** for routing slices across model tiers
+   (detail in `MODEL_NOTES.md`).
+
+Nothing here adds per-turn ceremony: the doctor and triage commands are on-demand, the doc
+checks piggyback on the existing `dox-check` gate, and the metadata lines are five short
+fields written once per learning. Prompt: `PROMPTS.md` §R (triage ritual).
 
 ---
 
@@ -201,7 +253,7 @@ v6.1 keeps every safeguard's intent and removes the make-work:
 6. **Run & observe the app.** A portable Playwright `smoke` gate + template replaces v6's habit
    of deferring every GUI check as "[~] can't verify". "Done" means run-and-observed.
 
-Full upgrade steps: `MIGRATION_v6.1.md`.
+Full upgrade steps: `migrate/MIGRATION.md`.
 
 ---
 
@@ -250,6 +302,9 @@ the bookkeeping the gate also polices. v6's worst overhead was exactly this; v6.
 | No trace of what was asked vs delivered | UserPromptLog + WorkLog | Hook + git |
 | Loses place between sessions/tools | STATE.md | Process |
 | Rules drift across tool configs | AGENTS.md + pointer stubs | By design |
+| Gate silently no-ops (missing tool, wrong PM) | run_gate v6.5 loud-fail + `just doctor` | Gated |
+| Descriptive docs decay into fiction | dox-check doc-refs + map-fresh checks | Gated |
+| Same mistake documented, then repeated | trigger map + ★ALWAYS + recurrence ratchet + sins-triage | Process |
 
 ---
 
@@ -346,6 +401,8 @@ Ecosystem-standard names (AGENTS.md, GEMINI.md, PRD) are left alone — tools ma
 |---|---|
 | `just verify` | Fast **code** gates (lint, types, tests, library checks, schema, sins audit, dox). Run freely. |
 | `just verify-all` | Everything in `verify` + tasks + prompt-log + app smoke. Pre-commit / CI. |
+| `just doctor` | Harness self-test: every configured gate can actually execute. Run after scaffold / on a new machine / on unexpected skips. |
+| `just sins-triage` | Learning-loop health: promotion candidates, missing triggers, digest budget, bloat. |
 | `just audit-sins` | ast-grep scan of the taxonomy's rules (self-heals if stale). |
 | `just sins-sync` | Explicitly regenerate `rules/` + the index from the taxonomy. |
 | `just smoke` | Run & observe the app (Playwright), if a `smoke` script is configured. |
@@ -382,5 +439,5 @@ Ecosystem-standard names (AGENTS.md, GEMINI.md, PRD) are left alone — tools ma
   gate pass, stop — that's the v6 failure mode. The gate should describe an objective truth
   about the product, or it shouldn't be a hard gate.
 
-The whole kit is `suds-vibe-coding-kit-v6.4.tar`. Nothing here requires GitHub or any service;
+The whole kit is `suds-vibe-coding-kit-v6.5.tar`. Nothing here requires GitHub or any service;
 it is plain files plus two commands.
