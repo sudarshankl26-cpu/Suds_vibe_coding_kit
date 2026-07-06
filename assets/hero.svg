@@ -1,37 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-label="Sud's Vibe Coding Kit">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Sud's Vibe Coding Kit v6.5">
   <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FAFBFC"/>
+      <stop offset="100%" stop-color="#F1F3F8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b5bdb"/>
+      <stop offset="100%" stop-color="#7950f2"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.10"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
     <style>
-      .ink{fill:#1b2430} .muted{fill:#7b8494} .accent{fill:#3b5bdb}
-      .h1{font:600 52px Inter,-apple-system,'Segoe UI',sans-serif}
-      .eyebrow{font:600 15px Inter,-apple-system,'Segoe UI',sans-serif;letter-spacing:.18em}
-      .sub{font:400 20px Inter,-apple-system,'Segoe UI',sans-serif}
-      .chip{font:600 22px 'JetBrains Mono',ui-monospace,monospace;fill:#ffffff}
-      .lbl{font:600 15px 'JetBrains Mono',ui-monospace,monospace;fill:#3a4150}
+      .h1{font:700 54px Inter,-apple-system,'Segoe UI',sans-serif;fill:#1b2430;letter-spacing:-0.02em}
+      .eyebrow{font:700 14px Inter,-apple-system,'Segoe UI',sans-serif;letter-spacing:.22em;fill:url(#accent)}
+      .sub{font:400 19px Inter,-apple-system,'Segoe UI',sans-serif;fill:#5c6573}
+      .chip{font:700 18px 'JetBrains Mono',ui-monospace,monospace;fill:#fff}
+      .lbl{font:600 14px 'JetBrains Mono',ui-monospace,monospace;fill:#3a4150}
+      .lblw{font:700 13px Inter,-apple-system,'Segoe UI',sans-serif;fill:#1b2430}
+      .mut{font:500 11px Inter,-apple-system,'Segoe UI',sans-serif;fill:#7b8494}
+      .gate{font:700 13px 'JetBrains Mono',ui-monospace,monospace;fill:#3b5bdb}
     </style>
   </defs>
-  <rect x="1" y="1" width="1198" height="338" rx="22" fill="#FAFAFA" stroke="#e7e9ef" stroke-width="1.5"/>
-  <!-- left: text -->
-  <text x="64" y="92" class="eyebrow accent">AI&#160;&#160;CODING&#160;&#160;HARNESS</text>
-  <text x="62" y="158" class="h1 ink">Sud&#8217;s Vibe Coding Kit</text>
-  <rect x="64" y="184" width="78" height="34" rx="9" fill="#3b5bdb"/>
-  <text x="103" y="208" class="chip" text-anchor="middle">v6.4</text>
-  <text x="160" y="208" class="sub muted">plain files + two commands. No framework, no runtime deps.</text>
-  <text x="64" y="258" class="sub ink">Files you drop into a project so AI agents stop drifting,</text>
-  <text x="64" y="288" class="sub ink">dropping tasks, and re-reading your whole repo.</text>
-  <!-- right: motif — three contracts feed a gate -->
-  <g transform="translate(852,86)">
-    <rect x="0" y="0"   width="150" height="44" rx="10" fill="#ffffff" stroke="#e7e9ef" stroke-width="1.5"/>
-    <text x="16" y="28" class="lbl">PRD.md</text>
-    <rect x="0" y="58"  width="150" height="44" rx="10" fill="#ffffff" stroke="#e7e9ef" stroke-width="1.5"/>
-    <text x="16" y="86" class="lbl">AGENTS.md</text>
-    <rect x="0" y="116" width="150" height="44" rx="10" fill="#ffffff" stroke="#e7e9ef" stroke-width="1.5"/>
-    <text x="16" y="144" class="lbl">STATE.md</text>
-    <!-- arrow -->
-    <path d="M168 80 H232" fill="none" stroke="#c7ccd8" stroke-width="2"/>
-    <path d="M226 73 L236 80 L226 87" fill="none" stroke="#c7ccd8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- gate circle with check -->
-    <circle cx="286" cy="80" r="40" fill="#ffffff" stroke="#3b5bdb" stroke-width="1.5"/>
-    <path d="M268 80 l12 12 l22 -26" fill="none" stroke="#3b5bdb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="286" y="150" class="lbl" text-anchor="middle">just verify</text>
+
+  <!-- background -->
+  <rect width="1200" height="360" rx="24" fill="url(#bg)" stroke="#e7e9ef" stroke-width="1"/>
+
+  <!-- left: text block -->
+  <text x="72" y="86" class="eyebrow">AI  CODING  HARNESS</text>
+  <text x="68" y="150" class="h1">Sud&#8217;s Vibe Coding Kit</text>
+
+  <!-- version chip (gradient pill) -->
+  <rect x="72" y="174" width="74" height="30" rx="15" fill="url(#accent)"/>
+  <text x="109" y="194" class="chip" text-anchor="middle">v6.5</text>
+
+  <text x="158" y="194" class="sub">plain files + two commands. No framework, no runtime deps.</text>
+  <text x="72" y="236" class="sub">Files you drop into a project so AI agents stop drifting,</text>
+  <text x="72" y="262" class="sub">dropping tasks, and re-reading your whole repo.</text>
+
+  <!-- right: motif — three contracts feed the gate, output = green build -->
+  <g transform="translate(770,70)">
+    <!-- contract cards -->
+    <g filter="url(#shadow)">
+      <rect x="0"   y="0"   width="156" height="58" rx="12" fill="#fff" stroke="#e7e9ef"/>
+      <text x="78"  y="26" class="lblw" text-anchor="middle">PRD.md</text>
+      <text x="78"  y="44" class="mut" text-anchor="middle">what to build</text>
+
+      <rect x="0"   y="74"  width="156" height="58" rx="12" fill="#fff" stroke="#e7e9ef"/>
+      <text x="78"  y="100" class="lblw" text-anchor="middle">AGENTS.md</text>
+      <text x="78"  y="118" class="mut" text-anchor="middle">the rules</text>
+
+      <rect x="0"   y="148" width="156" height="58" rx="12" fill="#fff" stroke="#e7e9ef"/>
+      <text x="78"  y="174" class="lblw" text-anchor="middle">STATE.md</text>
+      <text x="78"  y="192" class="mut" text-anchor="middle">where we are</text>
+    </g>
+
+    <!-- connector lines -->
+    <path d="M156 29  H210" fill="none" stroke="#c7ccd8" stroke-width="2"/>
+    <path d="M156 103 H210" fill="none" stroke="#c7ccd8" stroke-width="2"/>
+    <path d="M156 177 H210" fill="none" stroke="#c7ccd8" stroke-width="2"/>
+
+    <!-- gate (rounded rect with check, gradient border) -->
+    <rect x="210" y="74" width="120" height="100" rx="16" fill="#fff" stroke="url(#accent)" stroke-width="2"/>
+    <circle cx="270" cy="115" r="22" fill="#f1f3f8"/>
+    <path d="M258 116 l9 9 l16 -18" fill="none" stroke="url(#accent)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="270" y="156" class="gate" text-anchor="middle">just verify</text>
+
+    <!-- output arrow to green result -->
+    <path d="M330 124 H372" fill="none" stroke="#2b8a6e" stroke-width="2"/>
+    <path d="M366 118 L374 124 L366 130" fill="none" stroke="#2b8a6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="372" y="104" width="48" height="40" rx="8" fill="#2b8a6e"/>
+    <text x="396" y="129" class="lbl" text-anchor="middle" fill="#fff">&#10003;</text>
   </g>
 </svg>
