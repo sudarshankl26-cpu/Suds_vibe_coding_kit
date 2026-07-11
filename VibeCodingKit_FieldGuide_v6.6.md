@@ -1,4 +1,4 @@
-# Sud's Vibe Coding Kit — Field Guide (v6.5)
+# Sud's Vibe Coding Kit — Field Guide (v6.6)
 
 *Concepts, the problems they solve, why they work, and how to run it.*
 For solo, multi-tool development (Claude Code, Kilo/VSCodium, Zed, OpenCode, Windsurf,
@@ -56,12 +56,98 @@ wrong thing. Five minutes of questions here saves hours of rework.
   STATE.md, following AGENTS.md." (Any tool that reads AGENTS.md works.)
 - **After a bug is fixed:** "Add it to SinsGotchasLearnings.md as a prose entry (an ast-grep rule
   only if it's a clean structural pattern)."
-- **Upgrade the kit later:** in a terminal (not the agent), unpack the new kit elsewhere and run
-  `migrate/migrate_kit.py --kit <new-kit> --plan` from your project, then `--apply`. See
-  `migrate/MIGRATION.md`.
+- **A bug survived a fix attempt:** "This bug survived a fix. Follow `skills/diagnose-bugs.md`:
+  build a one-command repro first (an existing failing test counts), then ranked hypotheses."
+- **Upgrade the kit later (v6.6 — zero steering):** unpack the new kit into `.kit-incoming/` in
+  your project and tell your agent: "Upgrade the kit — read
+  `.kit-incoming/migrate/UPGRADE_AUTOPILOT.md` and execute it end to end." It backs up,
+  branches, snapshots dirty work, applies, merges by written rule, verifies, commits, and
+  reports — asking you nothing unless a data-loss stop condition fires.
 
 The rest of this guide explains *why* each piece exists. You don't need it to start — it's what
 makes the kit make sense once you do.
+
+---
+
+## What's new in v6.6 — engineering discipline, distilled from a real skills library
+
+**The soul of v6.6, in one paragraph.** Every kit version until now hardened the *scaffolding*
+around the work — contracts against drift (v4–v6), gates that can't lie (v6.5), a learning
+loop with a motor (v6.5). v6.6 is the first version that shapes **the work itself**: it gives
+every unit of engineering one through-line and a dispatcher. The through-line: a question the
+grill can't settle becomes a *throwaway prototype* instead of a buried assumption → the plan
+is cut into **vertical tracer bullets** (each phase demoable end-to-end, never "all models,
+then all routes") → a hard unit is built *eval-first at an agreed seam* ("the interface is the
+test surface" — the one phrase that connects testing, debugging, review, and design here) →
+the moment one fix attempt fails, the agent stops guessing and builds a **red-capable
+one-command repro loop** → the phase closes with a **two-axis review** (standards and spec,
+never merged, so neither masks the other) → what was learned enters the sins ratchet → the
+session hands off clean at a phase boundary through STATE.md. The dispatcher is the **ceremony
+router** (AGENTS.md §0a): one table that says which discipline a situation gets, what it
+costs, and — as binding as the trigger — when to SKIP it. That last column is the v6.6
+insurance against the v6.0 disease: quality machinery is only allowed to fire where its
+expected value exceeds its cost, and `sins-triage` step 7 audits the machinery's own weight
+over time. Around all of this sits the new **upgrade autopilot**: future kit versions install
+themselves with zero steering (drop the folder in, say "upgrade the kit").
+
+v6.6 is **prose-only** (no new gates, no per-turn ceremony). Source material: **Matt Pocock's
+`skills` library v1.1.0** — the same library whose `grill-with-docs` seeded this kit's grill.
+Six teachings were incorporated and made kit-native; the process-heavy rest was deliberately
+rejected. The pieces in detail:
+
+1. **Test-quality rules (`AGENTS.md` §2 "Testing specific" + §4a).** What makes a test worth
+   keeping: never implementation-coupled (test observable behavior through the public
+   interface — **the interface is the test surface**), never tautological (expected values
+   from an independent source, not recomputed the code's way), mock **only** true externals
+   (APIs, time, randomness — a real test DB beats a mocked data layer), and never horizontal
+   slicing (all-tests-first verifies imagined behavior). §4a eval-first now begins by
+   **agreeing the test seams**, then runs red→green one vertical slice at a time.
+2. **Feedback-loop debugging (`skills/diagnose-bugs.md`; §6a rung 0; digest #14).** The
+   discipline for hard bugs: FIRST build a **red-capable, deterministic, fast, one-command
+   repro** — "no repro command, no hypotheses" — minimise it until every element is
+   load-bearing, then test 3–5 *ranked, falsifiable* hypotheses ("if X, changing Y makes it
+   disappear") with `[DEBUG-<id>]`-tagged logs (cleanup is one grep), and close with a
+   regression test at a correct seam + the confirmed cause in the commit message. A
+   human-in-the-loop repro script template ships for bugs only the user can see.
+3. **Vertical slices + expand→contract (§4b; digest #17).** Every phase is a **tracer
+   bullet**: a narrow, complete, demoable path through all layers. The one exception — wide
+   mechanical refactors — sequences as expand → migrate (green batches) → contract. And a
+   **context-hygiene rule**: reasoning degrades well before the window fills, and a model
+   can't measure its own token use — so the rule is observable: hand off through STATE.md at
+   phase boundaries, at most ~2 completed phases per session, never compact mid-phase.
+4. **Two-axis phase-end review (`skills/code-review.md`; §5).** Standards (repo rules +
+   Fowler-smell baseline; skip what `just verify` already gates) and Spec (acceptance
+   criteria quoted per finding; scope creep flagged), run as parallel subagents where
+   available and **reported separately** — one review merged is one axis masked.
+5. **Deep modules (`skills/deep-modules.md`; §2).** A precise design vocabulary (module,
+   interface, seam, adapter, leverage, locality), the **deletion test** for shallow
+   indirection, "one adapter = hypothetical seam, two = real", dependency categories that
+   decide test strategy, and **design-it-twice** (sketch ≥2 genuinely different interfaces,
+   then recommend one) for any non-trivial module.
+6. **Handoff as a discipline (`skills/handoff.md`).** §4b's context-hygiene rule ("hand off
+   at phase boundaries") now has a checklist behind it: cursor current, half-done work named
+   file by file, decisions settled in chat promoted to `open_decisions`, flags swept, an
+   executable `next_action`, verify green or the red documented — committed, so it exists for
+   the next tool. The test: a cold agent resumes within two minutes without asking anything
+   already settled.
+7. **Zero-steering upgrades (`migrate/UPGRADE_AUTOPILOT.md` + `migrate_kit.py --auto`).**
+   Your two actions: drop the new kit in, read the report. Everything between — discovery,
+   backup, branch, dirty-tree snapshot, hash-classified apply, deterministic sins merge,
+   rule-based semantic merges, doctor + verify-all, commit — runs unattended, with four
+   data-loss stop conditions as the only permitted interruptions.
+8. **Prototype-to-answer (`skills/prototype-to-answer.md`; grill detour).** A design question
+   paper can't settle gets a throwaway prototype — logic questions as a tiny TUI around a
+   pure, liftable module; UI questions as ~3 structurally different variants behind
+   `?variant=` in the real page. The answer is the deliverable; the code is deleted. The
+   grill also records **rejected approaches with reasons** so they aren't re-proposed later.
+
+**Rejected** (as important as what was kept): the issue-tracker triage state machine, the
+`wayfinder` shared ticket-map, label mappings, the teach/writing/wizard skills, and the skill
+router — tracker- and team-process weight that the kit's file contracts already cover, or
+exactly the ceremony v6.1 removed. The library's meta-lesson on skill-writing (leading words,
+positive phrasing over prohibitions, pruning no-ops) was applied to the new prose itself.
+
+Digest cost: one rewritten item (#14, the debug ladder) + one new (#17, vertical slices) — the attention budget stays ≤20 with headroom.
 
 ---
 
@@ -305,6 +391,11 @@ the bookkeeping the gate also polices. v6's worst overhead was exactly this; v6.
 | Gate silently no-ops (missing tool, wrong PM) | run_gate v6.5 loud-fail + `just doctor` | Gated |
 | Descriptive docs decay into fiction | dox-check doc-refs + map-fresh checks | Gated |
 | Same mistake documented, then repeated | trigger map + ★ALWAYS + recurrence ratchet + sins-triage | Process |
+| Tests that pass but prove nothing (tautology / mock-your-own) | §2 Testing anti-patterns + §4a seams-first | Process |
+| Thrashing on a hard bug without a repro | feedback-loop debugging (skills/diagnose-bugs.md, §6a rung 0) | Process |
+| Phases built as horizontal layers, nothing demoable | vertical-slice / tracer-bullet phasing (§4b) | Process |
+| Diff drifts from the phase's spec unnoticed | two-axis phase-end review (skills/code-review.md) | Process |
+| Shallow pass-through modules accumulate | deep-modules vocabulary + deletion test (skills/deep-modules.md) | Process |
 
 ---
 
@@ -422,6 +513,12 @@ Ecosystem-standard names (AGENTS.md, GEMINI.md, PRD) are left alone — tools ma
 | Touching the database / units | `DATA_MODEL.md` + `schema_rules.json` |
 | Adding a new library | `verification/` (write `verify_<lib>` first) |
 | Right after fixing a bug | `SinsGotchasLearnings.md` (prose; rule if structural) |
+| A bug survived one fix attempt | `skills/diagnose-bugs.md` (repro loop before attempt 2) |
+| Closing a phase (final commit) | `skills/code-review.md` (two-axis; skip if trivial) |
+| Creating a new module/interface | `skills/deep-modules.md` (deletion test) |
+| A design question paper can't settle | `skills/prototype-to-answer.md` |
+| Ending a session mid-task / switching tools | `skills/handoff.md` |
+| Upgrading the kit itself | `migrate/UPGRADE_AUTOPILOT.md` (hands-off) |
 | About to start any task | `AGENTS.md` §0b digest, then the INDEX for the area |
 | Unsure of the rules | `AGENTS.md` |
 
@@ -439,5 +536,5 @@ Ecosystem-standard names (AGENTS.md, GEMINI.md, PRD) are left alone — tools ma
   gate pass, stop — that's the v6 failure mode. The gate should describe an objective truth
   about the product, or it shouldn't be a hard gate.
 
-The whole kit is `suds-vibe-coding-kit-v6.5.tar`. Nothing here requires GitHub or any service;
+The whole kit is `suds-vibe-coding-kit-v6.6.tar`. Nothing here requires GitHub or any service;
 it is plain files plus two commands.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sud's Vibe Coding Kit v6.5 — Working Reference</title>
+<title>Sud's Vibe Coding Kit v6.6 — Working Reference</title>
 <script src="https://unpkg.com/lucide@latest"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -161,10 +161,10 @@
   <header class="glass">
     <div class="blob b1"></div><div class="blob b2"></div>
     <span class="eyebrow"><i data-lucide="map"></i> Keep this open while you build</span>
-    <h1>Sud's Vibe Coding Kit <span class="v">v6.5</span></h1>
+    <h1>Sud's Vibe Coding Kit <span class="v">v6.6</span></h1>
     <p>Files you drop into a project so AI coding agents stop drifting, dropping tasks, and re-reading your whole repo — <b>without</b> spending their budget proving they followed a process.</p>
     <div class="assets">
-      <span>Kit:</span> <span class="filechip">suds-vibe-coding-kit-v6.5.tar</span>
+      <span>Kit:</span> <span class="filechip">suds-vibe-coding-kit-v6.6.tar</span>
       <span>·</span> <span>Tools:</span> Claude Code · Codex · Cursor · Windsurf · Kilocode · Zed · OpenCode · Stagewise · Qoder
       <span>·</span> <span>Tested with:</span> GLM · DeepSeek · MiniMax · MiMo · Claude · Gemini
     </div>
@@ -179,7 +179,7 @@
     <a href="#files">Which file when</a>
     <span class="sep">·</span>
     <a href="#theory">Why it works</a>
-    <a href="#new">What's new in v6.5</a>
+    <a href="#new">What's new in v6.6</a>
     <a href="#history">History</a>
   </nav>
 
@@ -236,8 +236,8 @@
     <div class="flow">
       <div class="fnode"><div class="fic"><i data-lucide="compass"></i></div><h4>Orient</h4><p>Read RepoMap + STATE — don't re-walk the tree</p></div>
       <div class="fnode"><div class="fic"><i data-lucide="list-checks"></i></div><h4>Track</h4><p>Real deliverables → OpenTasks (not process steps)</p></div>
-      <div class="fnode"><div class="fic"><i data-lucide="hammer"></i></div><h4>Build</h4><p>One phase; <code>just verify</code> freely (stays green)</p></div>
-      <div class="fnode"><div class="fic"><i data-lucide="shield-check"></i></div><h4>Verify-all</h4><p><code>just verify-all</code> before commit — tasks + smoke</p></div>
+      <div class="fnode"><div class="fic"><i data-lucide="hammer"></i></div><h4>Build</h4><p>One vertical phase; the §0a router picks any ceremony; <code>just verify</code> freely</p></div>
+      <div class="fnode"><div class="fic"><i data-lucide="shield-check"></i></div><h4>Review + verify-all</h4><p>Two-axis review (S), then <code>just verify-all</code> — tasks + smoke</p></div>
       <div class="fnode"><div class="fic"><i data-lucide="save"></i></div><h4>Record</h4><p>WorkLog + STATE; bug → SinsGotchas prose (rule if structural)</p></div>
     </div>
     <div class="grid cols-3" style="margin-top:16px">
@@ -279,7 +279,7 @@
 
   <!-- ===== PROMPTS & SCENARIOS (expanded) ===== -->
   <div class="sectitle" id="scenarios"><h2>⑤ Prompts &amp; scenarios — copy, paste, go</h2><span class="line"></span></div>
-  <p style="font-size:.88rem;color:var(--body);margin:-2px 4px 2px">Once the project exists, you mostly reuse a handful of messages. Pick your situation, paste, done. Each maps to a full prompt in <span class="filechip">PROMPTS.md</span> — the label letter (G0, G1, A–R) tells you where.</p>
+  <p style="font-size:.88rem;color:var(--body);margin:-2px 4px 2px">Once the project exists, you mostly reuse a handful of messages. Pick your situation, paste, done. Each maps to a full prompt in <span class="filechip">PROMPTS.md</span> — the label letter (G0, G1, A–V) tells you where.</p>
 
   <!-- 5a: starting / resuming -->
   <details open>
@@ -315,18 +315,26 @@
 
         <div class="prompt"><span class="lbl">⛶ Plan a big / complex change <span style="opacity:.7">(N)</span></span>
           This is a large task (a refactor / 3+ files). Follow <span class="f">AGENTS.md</span> §4b: write a dated<br>
-          plan in <span class="f">plans/</span>, keep each phase small, show me the plan, then execute phase by phase.<br>
-          <span class="tag">When: &gt;3 files, a refactor, or &gt;~300k expected tokens</span></div>
+          plan in <span class="f">plans/</span>, slice it <b>vertically</b> (each phase a demoable tracer bullet through<br>
+          every layer; wide refactors go expand → migrate → contract), then execute phase by phase.<br>
+          <span class="tag">When: &gt;3 files, a refactor, or work that won't fit one session</span></div>
 
         <div class="prompt"><span class="lbl">🧪 Eval-first for a hard unit <span style="opacity:.7">(L)</span></span>
-          Before you implement &lt;unit&gt;, treat it as a hard part (AGENTS.md §4a): list the edge cases,<br>
-          write the eval/tests <em>first</em>, show me what would fail, then implement to pass them.<br>
+          Before you implement &lt;unit&gt;, treat it as a hard part (AGENTS.md §4a): agree the test seams<br>
+          (the public interface), list the edge cases as a table, then work one slice at a time —<br>
+          one failing test → green → next. <span class="c"># the interface is the test surface</span><br>
           <span class="tag">When: validation, parsers, money/units/date math, branchy logic</span></div>
 
         <div class="prompt"><span class="lbl">🧩 Delegate a phase to subagents <span style="opacity:.7">(O)</span></span>
           This phase has independent slices. Follow <span class="f">AGENTS.md</span> §4b: route each slice to a<br>
           subagent by stakes, write to <span class="f">.scratch/&lt;task&gt;/</span>, return path + 3-line summary.<br>
           <span class="tag">When: tool supports subagents, slices are genuinely independent</span></div>
+
+        <div class="prompt"><span class="lbl violet">🧫 Prototype to answer <span style="opacity:.7">(U · v6.6)</span></span>
+          We can't settle &lt;question&gt; on paper. Build a throwaway prototype per <span class="f">skills/prototype-to-answer.md</span>:<br>
+          logic → tiny terminal app around a pure liftable module; UI → 3 structurally different variants<br>
+          behind <span class="f">?variant=</span>. Record the answer, then DELETE the prototype.<br>
+          <span class="tag">When: a grill/plan branch is genuinely undecidable by discussion</span></div>
       </div>
     </div>
   </details>
@@ -355,12 +363,17 @@
           <span class="f">#PATH_DECISION</span>. Sweep them before the phase is done.<br>
           <span class="tag">When: a constraint could be lost between sessions</span></div>
 
-        <div class="prompt"><span class="lbl rose">🆘 Stuck — escalate, don't thrash <span style="opacity:.7">(M)</span></span>
-          The same test/error has failed ~3 times. Stop guessing and follow AGENTS.md §6a: read the full<br>
-          error + type-checker output; write a tiny <span class="f">verification/</span> probe; <b>search the web /<br>
-          Context7 freely</b> — your training has a cutoff, so look up the exact error &amp; current API.<br>
-          <span class="c"># do not ration the search</span><br>
-          <span class="tag">When: 3 failed attempts on the same error</span></div>
+        <div class="prompt"><span class="lbl rose">🔬 Hard bug — build the loop first <span style="opacity:.7">(T · v6.6)</span></span>
+          This bug survived a fix attempt. Follow <span class="f">skills/diagnose-bugs.md</span>: build a red-capable,<br>
+          deterministic, ONE-command repro first (an existing failing test counts — build nothing), minimise it,<br>
+          then 3–5 ranked falsifiable hypotheses. <span class="c"># no repro command, no hypotheses</span><br>
+          <span class="tag">When: ONE failed fix attempt and the symptom persists</span></div>
+
+        <div class="prompt"><span class="lbl rose">🆘 Still stuck — escalate <span style="opacity:.7">(M)</span></span>
+          The same error has survived ~3 attempts. AGENTS.md §6a: read the full error + type-checker output;<br>
+          write a tiny <span class="f">verification/</span> probe; <b>search the web / Context7 freely</b> — your training<br>
+          has a cutoff. <span class="c"># do not ration the search</span><br>
+          <span class="tag">When: 3 failed attempts even WITH a repro loop</span></div>
       </div>
     </div>
   </details>
@@ -389,6 +402,12 @@
           <span class="c"># audit-sins self-heals — no sync dance</span><br>
           <span class="tag">When: any bug fix, before moving on</span></div>
 
+        <div class="prompt"><span class="lbl green">🔍 Two-axis phase review <span style="opacity:.7">(S · v6.6)</span></span>
+          The phase is code-complete. Run <span class="f">skills/code-review.md</span> on the phase diff: one review for<br>
+          <b>Standards</b> (repo rules + smell baseline), one for <b>Spec</b> (acceptance criteria, scope creep) —<br>
+          parallel subagents, reported separately, never merged.<br>
+          <span class="tag">When: phase end, before its final commit · SKIP: &lt;3 files or docs-only</span></div>
+
         <div class="prompt"><span class="lbl">🔎 Drift audit <span style="opacity:.7">(I)</span></span>
           Run a drift audit: is the code still consistent with PRD/GLOSSARY/DATA_MODEL? Are there terms<br>
           in code that aren't in the glossary? Any silent redefinitions? Report findings as a list.<br>
@@ -402,17 +421,18 @@
     <summary>Switching tools, upgrading the kit, pressure-testing</summary>
     <div class="body">
       <div class="grid cols-2">
-        <div class="prompt"><span class="lbl">⇄ Switch to a different AI tool <span style="opacity:.7">(J)</span></span>
-          I'm switching from &lt;tool A&gt; to &lt;tool B&gt;. Update <span class="f">STATE.md</span> so the next agent can resume<br>
+        <div class="prompt"><span class="lbl">⇄ Switch tools / end mid-task <span style="opacity:.7">(J)</span></span>
+          I'm switching from &lt;tool A&gt; to &lt;tool B&gt;. Run <span class="f">skills/handoff.md</span>: update <span class="f">STATE.md</span> so the next agent can resume<br>
           cold: current phase/task, anything half-done, anything blocked, decisions made this session not<br>
           yet in a contract (put those in <span class="f">open_decisions</span>). Leave the repo <span class="f">just verify-all</span>-green.<br>
           <span class="tag">When: handoff between Claude/Cursor/Zed/OpenCode/etc.</span></div>
 
-        <div class="prompt"><span class="lbl">⤴ Upgrade the kit</span>
-          <span class="c"># in a terminal, NOT the agent — unpack the new kit elsewhere, then from your project:</span><br>
-          python /path/to/new-kit/migrate/<span class="f">migrate_kit.py</span> --kit /path/to/new-kit --plan<br>
-          <span class="c"># review, then re-run with --apply; resolve any *.kit-incoming. See migrate/MIGRATION.md</span><br>
-          <span class="tag">When: a new kit version ships; v6.4→v6.5 has a manual swap shortcut too</span></div>
+        <div class="prompt"><span class="lbl">⤴ Upgrade the kit — hands-off <span style="opacity:.7">(V · v6.6)</span></span>
+          <span class="c"># unpack the new kit into .kit-incoming/ in your project, then tell your agent:</span><br>
+          A newer kit is staged. Read <span class="f">.kit-incoming/migrate/UPGRADE_AUTOPILOT.md</span> and execute it<br>
+          end to end with zero questions; give me the final report.<br>
+          <span class="c"># backup + branch + WIP snapshot happen automatically; nothing of yours can be lost</span><br>
+          <span class="tag">When: a new kit version ships — your only two actions: drop it in, read the report</span></div>
 
         <div class="prompt"><span class="lbl">B · Pressure-test the PRD</span>
           Read <span class="f">PRD.md</span> and attack it for scope creep, missing anti-goals, and vague terms. List the<br>
@@ -443,6 +463,12 @@
         <div class="when">New library</div><div><span class="filechip">verification/</span> <span style="color:var(--muted);font-size:.8rem">(write verify_&lt;lib&gt; first)</span></div>
         <div class="when">Known bugs</div><div><span class="filechip">AGENTS.md §0b</span> <span class="filechip">SinsGotchas INDEX</span></div>
         <div class="when">Building UI</div><div><span class="filechip">DESIGN_GUIDELINES.md</span></div>
+        <div class="when">Bug survived a fix</div><div><span class="filechip">skills/diagnose-bugs.md</span></div>
+        <div class="when">Phase end</div><div><span class="filechip">skills/code-review.md</span></div>
+        <div class="when">New module</div><div><span class="filechip">skills/deep-modules.md</span></div>
+        <div class="when">Undecidable design Q</div><div><span class="filechip">skills/prototype-to-answer.md</span></div>
+        <div class="when">Ending mid-task / tool switch</div><div><span class="filechip">skills/handoff.md</span></div>
+        <div class="when">Kit upgrade</div><div><span class="filechip">migrate/UPGRADE_AUTOPILOT.md</span></div>
         <div class="when">Unsure of rules</div><div><span class="filechip">AGENTS.md</span></div>
       </div>
     </section>
@@ -517,17 +543,18 @@
     </div>
   </div>
 
-  <!-- WHAT'S NEW IN v6.5 -->
-  <div class="sectitle" id="new"><h2>What's new in v6.5</h2><span class="line"></span></div>
+  <!-- WHAT'S NEW IN v6.6 -->
+  <div class="sectitle" id="new"><h2>What's new in v6.6</h2><span class="line"></span></div>
   <section class="glass card">
-    <p class="lead" style="margin-top:2px">Three real-world failure modes, closed — and all still true to "gate the product, not the process": no new per-turn ceremony.</p>
+    <p class="lead" style="margin-top:2px">v6.6 shapes the work itself: one through-line for every unit of engineering, a dispatcher that says when each discipline fires — and when to SKIP it — and a hands-off kit upgrade. All prose; no new gates.</p>
     <div class="whatsnew">
-      <div class="wn"><b>No silent false-greens</b>A gate whose tool is missing now FAILS (exit 3) instead of printing "skipping" and passing. The JS package manager is detected from the lockfile (never assumed). New <span class="filechip new">just doctor</span> self-tests the harness — a green doctor is what makes a green verify trustworthy.</div>
-      <div class="wn"><b>Docs that can't rot silently</b><span class="filechip">dox-check</span> now fails on wholesale-stale path references in contract docs and on leftover <code>[fill in]</code> placeholders in RepoMapReadFirst — an agent that catches one stale doc rationally stops trusting all of them.</div>
-      <div class="wn"><b>The learning loop gets a motor</b>Sins entries carry retrieval metadata (<code>Scope</code>/<code>Trigger</code>/<code>Enforced</code>/<code>Digest</code>/<code>Recurrences</code>); the index has a <b>★ALWAYS</b> block + a <b>trigger map</b> + enforced entries collapsed out of the read path. The <b>recurrence ratchet</b>: a repeat is never re-documented — promote it (type → rule → test → digest).</div>
-      <div class="wn"><b>Subagent economics (§4b)</b>A <b>context firewall</b> (subagents write to <code>.scratch/&lt;task&gt;/</code>, return path + 3-line summary — never raw dumps), <b>handoff packets</b>, and a stakes/reversibility/ambiguity floor for routing slices across model tiers.</div>
-      <div class="wn"><b>CRLF-immune gates</b>Every gate normalizes <code>\r\n</code> → <code>\n</code> on read, so a Windows editor that saves CRLF can no longer silently break the regexes that anchor on <code>\n</code>.</div>
-      <div class="wn"><b>Migration tooling documented</b>v6.4→v6.5 has a surgical manual swap (a dozen infra files); older projects use the classify/backup migrator that never overwrites your state.</div>
+      <div class="wn"><b>The ceremony router (§0a)</b>One table: situation → discipline → cost → <b>SKIP when</b>. The skip condition is as binding as the trigger — machinery only fires where its value exceeds its cost. <span class="filechip">sins-triage</span> step 7 audits the machinery's own weight over time.</div>
+      <div class="wn"><b>Test quality has rules (§2, §4a)</b>No implementation-coupled tests, no tautological expected values, mock only true externals, no all-tests-up-front. Eval-first now starts by agreeing the seams: <b>the interface is the test surface</b> — the phrase that ties testing, review, debugging, and design together.</div>
+      <div class="wn"><b>Feedback-loop debugging</b><span class="filechip new">skills/diagnose-bugs.md</span> — ONE failed fix → build a red-capable one-command repro before attempt 2 (an existing failing test counts, zero cost). Minimise, then 3–5 ranked falsifiable hypotheses, <code>[DEBUG-id]</code> logs, regression test at a correct seam.</div>
+      <div class="wn"><b>Vertical slices + context hygiene (§4b)</b>Every phase a demoable <b>tracer bullet</b> through all layers; wide refactors go expand → migrate → contract. Hand off at phase boundaries (≤2 phases/session); never compact mid-phase — STATE.md is the durable memory, and <span class="filechip new">skills/handoff.md</span> is the checklist that makes a cold resume lossless.</div>
+      <div class="wn"><b>Two-axis phase review</b><span class="filechip new">skills/code-review.md</span> — Standards (repo rules + smell baseline) and Spec (acceptance criteria, scope creep) as parallel subagents, reported separately so neither masks the other. Fixed point: <code>phase_started_at</code> in STATE.md.</div>
+      <div class="wn"><b>Deep modules &amp; prototypes</b><span class="filechip new">skills/deep-modules.md</span> (deletion test; design-it-twice only at 3+ callers) and <span class="filechip new">skills/prototype-to-answer.md</span> (a question paper can't settle → throwaway prototype; keep the answer, delete the code).</div>
+      <div class="wn"><b>Upgrade autopilot</b><span class="filechip new">migrate/UPGRADE_AUTOPILOT.md</span> + <code>migrate_kit.py --auto</code>: drop the new kit in <code>.kit-incoming/</code>, say "upgrade the kit" — discovery, backup, branch, WIP snapshot, apply, deterministic sins merge, rule-based semantic merges, verify, commit, report. Zero questions unless a data-loss stop fires.</div>
     </div>
   </section>
 
@@ -535,6 +562,7 @@
   <div class="sectitle" id="history"><h2>Earlier milestones</h2><span class="line"></span></div>
   <section class="glass card">
     <div class="whatsnew">
+      <div class="wn grey"><b>v6.5 — trustworthy gates &amp; the learning motor</b>Gates fail loudly instead of fake-skipping (<span class="filechip">just doctor</span>); dox-check catches doc rot; sins metadata + ★ALWAYS + trigger map + recurrence ratchet; subagent context firewall (§4b); CRLF-immune gates.</div>
       <div class="wn grey"><b>v6.4 — inline flags &amp; design</b>§1a <code>#EXPORT_CRITICAL</code>/<code>#PLAN_UNCERTAINTY</code>/<code>#PATH_DECISION</code>; reuse-before-reinvent (§2); <span class="filechip">DESIGN_GUIDELINES.md</span> against AI-slop UI; beginner on-ramp; OpenAI Codex support.</div>
       <div class="wn grey"><b>v6.3 — open-weight tuning</b>Phased planning + subagent routing (§4b) for 1M-context open-weight models (GLM, DeepSeek, MiMo, MiniMax).</div>
       <div class="wn grey"><b>v6.2 — eval-first &amp; anti-thrash</b>Eval-first for hard units (§4a); the anti-thrash escalation ladder (§6a).</div>
@@ -547,7 +575,7 @@
     </div>
   </section>
 
-  <footer>Sud's Vibe Coding Kit v6.5 · keep this page open while you code · prompts are hook-captured verbatim (filtered) in Claude Code/OpenCode · audits run on ast-grep · plain files + two commands, no service required</footer>
+  <footer>Sud's Vibe Coding Kit v6.6 · keep this page open while you code · prompts are hook-captured verbatim (filtered) in Claude Code/OpenCode · audits run on ast-grep · plain files + two commands, no service required</footer>
 </div>
 <script>lucide.createIcons();</script>
 </body>

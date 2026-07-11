@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v6.5-1b2430?style=flat-square" alt="version">
+  <img src="https://img.shields.io/badge/version-v6.6-1b2430?style=flat-square" alt="version">
   <img src="https://img.shields.io/badge/philosophy-suggestions%20%3E%20gates-3b5bdb?style=flat-square" alt="philosophy">
   <img src="https://img.shields.io/badge/runtime%20deps-none-2b8a6e?style=flat-square" alt="no runtime deps">
   <img src="https://img.shields.io/badge/platform-Windows%2011%20%2B%20WSL-444?style=flat-square" alt="platform">
@@ -14,7 +14,7 @@
 <p align="center"><b>A small set of files you drop into a project <i>before</i> you write code, so AI coding agents stop drifting — without spending their budget proving they followed a process.</b></p>
 
 <p align="center">
-  <sub><b>What's new in v6.5:</b> trustworthy gates that can't silently false-green · docs that can't rot silently · a learning loop with a motor · subagent economics · CRLF-immune gates on Windows.</sub>
+  <sub><b>What's new in v6.6:</b> a ceremony router with skip conditions · test-quality rules & seams-first eval · feedback-loop debugging · vertical-slice phasing · two-axis phase reviews · deep-module design vocabulary · prototype-to-answer · handoff discipline · zero-steering kit upgrades.</sub>
 </p>
 
 <br>
@@ -149,9 +149,12 @@ Once set up, every session follows the same cheap rhythm:
 | **Continuing where you left off** | `Read RepoMapReadFirst.md and STATE.md, tell me where we are in two sentences, then continue.` |
 | **Adding a feature** | `I want to add <feature>. Update PRD.md / EXECUTION_PLAN.md for it first (separate commit), then build it phase by phase per AGENTS.md.` |
 | **Planning a big change** | `This is a large task. Follow AGENTS.md §4b: write a dated plan in plans/, keep phases small, show me the plan, then execute phase by phase.` |
-| **Switching AI tools** | `Read CONTEXT.md and the files it lists, then continue from STATE.md, following AGENTS.md.` |
+| **Switching AI tools / ending mid-task** | `Run skills/handoff.md: update STATE.md so the next agent resumes cold, then leave the repo verify-all-green.` |
 | **Building a UI (avoid "AI slop")** | See `PROMPTS.md` §Q — encodes `DESIGN_GUIDELINES.md` into the build prompt. |
 | **After fixing a bug** | `Add it to SinsGotchasLearnings.md as a prose entry (an ast-grep rule only if it's a clean structural pattern).` |
+| **A bug survived a fix attempt** | `Follow skills/diagnose-bugs.md: build a red-capable ONE-command repro first (an existing failing test counts), then 3–5 ranked falsifiable hypotheses.` |
+| **Closing a phase** | `Run skills/code-review.md on the phase diff: Standards and Spec as two parallel reviews, reported separately.` |
+| **Upgrading the kit (v6.6 — hands-off)** | Drop the new kit in `.kit-incoming/`, then: `Read .kit-incoming/migrate/UPGRADE_AUTOPILOT.md and execute it end to end with zero questions; give me the final report.` |
 
 ---
 
@@ -189,59 +192,32 @@ Claude Code · OpenAI Codex CLI · Gemini / Antigravity · Cursor · Windsurf ·
 | **Makes the right thing the cheap thing** | Re-orienting from `RepoMapReadFirst.md` costs ~2k tokens vs. a 50k re-walk. |
 | **Refuses to gate process** | Anything policing the agent's own prose stays a suggestion — so the agent builds, not proves. |
 
-Read `VibeCodingKit_FieldGuide_v6.5.md` for the full rationale, or open `VibeCodingKit_Infographic_v6.5.html` for the visual one-pager.
+Read `VibeCodingKit_FieldGuide_v6.6.md` for the full rationale, or open `VibeCodingKit_Infographic_v6.6.html` for the visual one-pager.
 
 ---
 
-## What's new in v6.5
+## What's new in v6.6
 
-v6.5 attacks the three failure modes observed across real builds — **gates that silently no-op'd, descriptive files that decayed into fiction, and a sins file that documented mistakes without preventing repeats** — and stays true to v6.1's *"gate the product, not the process."* No new per-turn ceremony.
+v6.6 shapes **the work itself**: it distills the durable engineering discipline from **Matt Pocock's `skills` library (v1.1.0)** into kit shape — one through-line for every unit of engineering, a dispatcher that says when each discipline fires *and when to skip it*, and a hands-off kit upgrade. All prose; no new gates; no new per-turn ceremony.
+
+| # | Improvement | What it closes |
+|:---:|:---|:---|
+| 1 | **The ceremony router** (`AGENTS.md` §0a) — situation → discipline → cost → **SKIP when**; skip conditions as binding as triggers; `sins-triage` audits the machinery's own weight | Quality ceremonies firing where their cost exceeds their value (the v6.0 disease) |
+| 2 | **Test quality has rules** (§2, §4a) — no implementation-coupled or tautological tests, mock only true externals, no all-tests-up-front; eval-first starts by agreeing the seams (**the interface is the test surface**), red before green | Tests that pass but prove nothing, and die on every refactor |
+| 3 | **Feedback-loop debugging** (`skills/diagnose-bugs.md`) — ONE failed fix → build a red-capable one-command repro before attempt 2 (an existing failing test counts); minimise; 3–5 ranked falsifiable hypotheses; regression test at a correct seam | Thrashing on a hard bug with guess-after-guess |
+| 4 | **Vertical-slice phasing + context hygiene** (§4b) — every phase a demoable **tracer bullet**; wide refactors go expand → migrate → contract; hand off at phase boundaries via `skills/handoff.md`, never compact mid-phase | Horizontal layers nothing can demo, and lossy mid-work compaction |
+| 5 | **Two-axis phase review** (`skills/code-review.md`) — Standards (repo rules + smell baseline) and Spec (acceptance criteria, scope creep) as parallel subagents, **never merged** | One review axis masking the other; silent scope creep |
+| 6 | **Deep modules & prototypes** (`skills/deep-modules.md`, `skills/prototype-to-answer.md`) — the deletion test, design-it-twice at 3+ callers, throwaway prototypes that answer undecidable design questions then get deleted (with a real graduation path) | Shallow pass-through modules; design debates that never resolve |
+| 7 | **Zero-steering upgrades** (`migrate/UPGRADE_AUTOPILOT.md` + `migrate_kit.py --auto`) — drop the new kit in `.kit-incoming/`, say "upgrade the kit": discovery, backup, branch, WIP snapshot, hash-classified apply, deterministic sins merge, rule-based semantic merges, verify, commit, report | Hand-diffing ~30 files every kit release |
+
+> **Upgrading from any older kit?** That's item 7 — two actions: drop the kit in, read the report.
+
+<details>
+<summary><b>v6.5 — trustworthy gates, docs that can't rot, a learning loop with a motor</b></summary>
+
+v6.5 attacked the three failure modes observed across real builds — **gates that silently no-op'd, descriptive files that decayed into fiction, and a sins file that documented mistakes without preventing repeats** — and stays true to v6.1's *"gate the product, not the process."* No new per-turn ceremony.
 
 | # | Improvement | What it closes |
 |:---:|:---|:---|
 | 1 | **No silent false-greens** — a configured-but-missing tool now fails loudly (exit 3 + the fix command); the JS package manager is detected from the lockfile; **`just doctor`** self-tests the harness | A real harness once silently no-op'd for an entire phase because "skipping" warnings were scrolled past |
-| 2 | **Docs that can't rot** (`dox-check`) — contract docs scanned for dead path refs; wholesale rot is a hard fail; `RepoMapReadFirst.md` fails on leftover `[fill in]` once the repo has real source | An agent that catches one stale doc rationally stops trusting all of them |
-| 3 | **Learning loop with a motor** — entries carry retrieval metadata; the index has an **ALWAYS block** + **trigger map**; the **recurrence ratchet** promotes repeats (type → ast-grep → test → digest) instead of re-documenting; `just sins-triage` | A sins file that documented mistakes without preventing repeats |
-| 4 | **Subagent economics** (§4b) — **context firewall** (subagents write to gitignored `.scratch/`, return path + 3-line summary), **handoff packets**, **stakes/reversibility/ambiguity routing floor** | One long trajectory that drowned its own context |
-| 5 | **CRLF-immune gates on Windows** — every gate normalizes `\r\n` → `\n` on read | A Windows editor saving CRLF silently broke gate regexes |
-
-> **Upgrading from v6.4?** It's a surgical swap of ~10 infra files — your contracts, learnings, logs, STATE.md, and `src/` are untouched. See `migrate/MIGRATION.md` §"v6.4 → v6.5 manual swap" inside the kit.
-
----
-
-## macOS / Linux — one prompt to adapt the kit
-
-The kit is authored Windows-first (it ships `scaffold.sh` for WSL/Unix already). To adapt for macOS or Linux, paste this into your agent **after extracting the kit**:
-
-```text
-I'm on macOS/Linux. Adapt this kit for my platform WITHOUT changing its rules or
-philosophy:
-1. Use scaffold.sh (not the .ps1). Install the one prerequisite with
-   `curl https://mise.run | sh`  (macOS alternative: `brew install mise`).
-2. When the final phase generates server-control scripts, generate POSIX
-   start-server.sh / stop-server.sh (kill-by-port via lsof or fuser) instead of
-   PowerShell .ps1 templates — still reading PORT from .env, never hardcoded.
-3. Keep just, uv, pnpm, ast-grep, the justfile, and ALL gates exactly as they are —
-   they're already cross-platform via mise.
-4. Leave AGENTS.md and every contract file unchanged.
-Show me a summary of what you changed.
-```
-
----
-
-## Inspirations & credits
-
-This kit stands on existing ideas and tools:
-
-- **`grill-to-prd`** is adapted from **Matt Pocock's** `grill-with-docs` skill — a relentless one-question-at-a-time requirements interview.
-- **`AGENTS.md`** follows the emerging cross-tool agent-instructions convention, so one rules file serves every agent.
-- **[ast-grep](https://ast-grep.github.io/)** powers the structural defect audits (a real parser, never regex on code).
-- **[mise](https://mise.jdx.dev/)** is the one-prerequisite toolchain manager; **[just](https://github.com/casey/just)** is the command runner behind the two gates.
-- **[Playwright](https://playwright.dev/)** backs the `smoke` gate so "done" means run-and-observed.
-- The optional hierarchical `AGENTS.md` layer (§10) is inspired by the **DOX** documentation-as-context framework.
-- v6.4's *inline flags* and *reuse-first* ideas were distilled from studying a production SAFe multi-agent harness — taking the ideas, not the team-process overhead.
-- v6.5's *subagent economics* (context firewall, handoff packets, routing floor) were borrowed from a premium-model orchestration harness and made tool-agnostic.
-
----
-
-<p align="center"><sub>Plain files + two commands. No GitHub, no service, no runtime dependency required.</sub></p>
+| 2 | **Docs that can't rot** (
